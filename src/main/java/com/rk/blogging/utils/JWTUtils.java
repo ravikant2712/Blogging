@@ -10,7 +10,7 @@ import java.util.Date;
 @Component
 public class JWTUtils {
 
-    private static final String SECRET = "THIS_IS_A_VERY_SECRET_KEY_FOR_JWT_123456";
+    private static final String SECRET = "THIS_IS_A_VERY_SECRET_KEY_FOR_ttt_123456";
     private static final long EXPIRATION_TIME = 1000 * 60 * 60 * 10; // 10 hours
 
     private final Key key = Keys.hmacShaKeyFor(SECRET.getBytes());
