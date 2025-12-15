@@ -3,6 +3,7 @@ package com.rk.blogging.exceptions;
 import com.rk.blogging.dto.ApiError;
 import com.rk.blogging.dto.ApiResponseWrapper;
 import com.rk.blogging.utils.ResponseBuilder;
+import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,6 +19,21 @@ import java.util.Map;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
+
+    @ExceptionHandler(TokenExceptions.class)
+    public ResponseEntity<ApiResponseWrapper<Void>> handleExpiredJwt(TokenExceptions ex) {
+
+        ApiError error = ApiError.builder()
+                .errorCode("AUTH_002")
+                .errorMessage("Token expired")
+                .build();
+        return ResponseBuilder.failure(
+                error,
+                "Authentication failed",
+                HttpStatus.UNAUTHORIZED
+        );
+
+    }
 
     @ExceptionHandler(BadCredentialsException.class)
     public ResponseEntity<ApiResponseWrapper<Void>> handleBadCredentials(
@@ -47,7 +63,7 @@ public class GlobalExceptionHandler {
                 );
 
         ApiError apiError = ApiError.builder()
-                .errorCode("VALIDATION_001")
+                .errorCode("VALIDATION_003")
                 .errorMessage("Invalid input data")
                 .fieldErrors(errors)
                 .build();

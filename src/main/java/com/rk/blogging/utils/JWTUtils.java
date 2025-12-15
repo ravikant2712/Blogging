@@ -39,6 +39,7 @@ public class JWTUtils {
 
     private Claims getClaims(String token) {
         return Jwts.parserBuilder()
+                .setAllowedClockSkewSeconds(60) // 1 minute
                 .setSigningKey(key)
                 .build()
                 .parseClaimsJws(token)

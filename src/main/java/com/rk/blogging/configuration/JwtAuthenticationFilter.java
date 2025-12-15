@@ -1,8 +1,12 @@
 package com.rk.blogging.configuration;
 
 
+import com.rk.blogging.exceptions.PostNotFoundException;
+import com.rk.blogging.exceptions.TokenExceptions;
 import com.rk.blogging.services.CustomUserDetailsService;
 import com.rk.blogging.utils.JWTUtils;
+import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.JwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -31,6 +35,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             FilterChain filterChain
     ) throws ServletException, IOException {
 
+
         String path = request.getRequestURI();
         // Skip Swagger and public endpoints
         if (path.startsWith("/swagger-ui")
@@ -43,6 +48,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
 
 
+        try
+        {
         String authHeader = request.getHeader("Authorization");
 
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
@@ -50,29 +57,62 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             String token = authHeader.substring(7);
             String username = jwtUtil.extractUsername(token);
 
-            if (username != null &&
-                    SecurityContextHolder.getContext().getAuthentication() == null &&
-                    jwtUtil.validateToken(token)) {
+                if (username != null &&
+                        SecurityContextHolder.getContext().getAuthentication() == null &&
+                        jwtUtil.validateToken(token)) {
 
-                UserDetails userDetails =
-                        userDetailsService.loadUserByUsername(username);
+                    UserDetails userDetails =
+                            userDetailsService.loadUserByUsername(username);
 
-                UsernamePasswordAuthenticationToken authentication =
-                        new UsernamePasswordAuthenticationToken(
-                                userDetails,
-                                null,
-                                userDetails.getAuthorities()
-                        );
+                    UsernamePasswordAuthenticationToken authentication =
+                            new UsernamePasswordAuthenticationToken(
+                                    userDetails,
+                                    null,
+                                    userDetails.getAuthorities()
+                            );
 
-                authentication.setDetails(
-                        new WebAuthenticationDetailsSource().buildDetails(request)
-                );
+                    authentication.setDetails(
+                            new WebAuthenticationDetailsSource().buildDetails(request)
+                    );
 
-                SecurityContextHolder.getContext()
-                        .setAuthentication(authentication);
-            }
+                    SecurityContextHolder.getContext()
+                            .setAuthentication(authentication);
+                }
+
+
+
+        }
+
+        }catch (ExpiredJwtException e)
+        {
+         //  throw  new TokenExceptions("Token Expired!");
+            handleJwtException(response, "JWT token has expired");
+            return;
+        } catch (JwtException | IllegalArgumentException ex) {
+            handleJwtException(response, "Invalid JWT token");
+            return;
         }
 
         filterChain.doFilter(request, response);
+    }
+
+
+    private void handleJwtException(HttpServletResponse response, String message)
+            throws IOException {
+
+        response.reset(); // VERY IMPORTANT
+        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+        response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
+
+        response.getWriter().write("""
+        {
+          "status": 401,
+          "error": "Unauthorized",
+          "message": "%s"
+        }
+        """.formatted(message));
+
+        response.getWriter().flush();
     }
 }
