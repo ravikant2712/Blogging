@@ -28,9 +28,6 @@ public class User {
     @Enumerated(EnumType.STRING)
     private Role role; // ADMIN or USER
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
-    private List<Post> posts;
-
     public enum Role {
         ADMIN, USER
     }

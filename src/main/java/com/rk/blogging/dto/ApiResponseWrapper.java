@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class ApiResponse<T> {
+public class ApiResponseWrapper<T> {
 
     private String status;   // SUCCESS / FAILURE
     private int code;

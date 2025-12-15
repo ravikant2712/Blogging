@@ -52,7 +52,6 @@ public class SecurityConfig {
     }
 
     // ✅ AuthenticationManager for Spring Security
-
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration authConfig) throws Exception {
         return authConfig.getAuthenticationManager();

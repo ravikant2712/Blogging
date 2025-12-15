@@ -1,7 +1,7 @@
 package com.rk.blogging.utils;
 
 import com.rk.blogging.dto.ApiError;
-import com.rk.blogging.dto.ApiResponse;
+import com.rk.blogging.dto.ApiResponseWrapper;
 import com.rk.blogging.dto.Meta;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -11,12 +11,12 @@ import java.util.UUID;
 
 public class ResponseBuilder {
 
-    public static <T> ResponseEntity<ApiResponse<T>> success(
+    public static <T> ResponseEntity<ApiResponseWrapper<T>> success(
             T data,
             String message,
             HttpStatus status
     ) {
-        ApiResponse<T> response = ApiResponse.<T>builder()
+        ApiResponseWrapper<T> response = ApiResponseWrapper.<T>builder()
                 .status("SUCCESS")
                 .code(status.value())
                 .message(message)
@@ -30,12 +30,12 @@ public class ResponseBuilder {
         return new ResponseEntity<>(response, status);
     }
 
-    public static ResponseEntity<ApiResponse<Void>> failure(
+    public static <T> ResponseEntity<ApiResponseWrapper<T>> failure(
             ApiError error,
             String message,
             HttpStatus status
     ) {
-        ApiResponse<Void> response = ApiResponse.<Void>builder()
+        ApiResponseWrapper<T> response = ApiResponseWrapper.<T>builder()
                 .status("FAILURE")
                 .code(status.value())
                 .message(message)

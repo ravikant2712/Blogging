@@ -1,11 +1,14 @@
 package com.rk.blogging.services;
 
 
+import com.rk.blogging.exceptions.PostNotFoundException;
 import com.rk.blogging.model.Post;
 import com.rk.blogging.repository.PostRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 
 @Service
@@ -26,7 +29,12 @@ public class PostService {
 
     public Post getPostBySlug(String slug) {
         return postRepository.findBySlug(slug)
-                .orElseThrow(() -> new RuntimeException("Post not found"));
+                .orElseThrow(() -> new PostNotFoundException("Post not found with id: " + slug));
+    }
+
+    public Post getPostById(Long postId) {
+        return postRepository.findById(postId)
+                .orElseThrow(() -> new PostNotFoundException("Post not found with id: " + postId));
     }
 
     public Post updatePost(Post post) {
@@ -39,5 +47,28 @@ public class PostService {
 
     public List<Post> getPostsByUser(Long userId) {
         return postRepository.findByUserId(userId);
+    }
+
+    public Post uploadPostImage(Long postId, MultipartFile file) throws IOException {
+
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new RuntimeException("Post not found"));
+
+        post.setImage(file.getBytes());
+        post.setImageType(file.getContentType());
+
+        return postRepository.save(post);
+    }
+
+    public byte[] getPostImage(Long postId) {
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new RuntimeException("Post not found"));
+        return post.getImage();
+    }
+
+    public String getPostImageType(Long postId) {
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new RuntimeException("Post not found"));
+        return post.getImageType();
     }
 }
