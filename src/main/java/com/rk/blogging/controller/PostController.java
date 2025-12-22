@@ -118,10 +118,18 @@ public class PostController {
             summary = "Update post",
             security = @SecurityRequirement(name = "bearerAuth")
     )
-    @PutMapping("/{id}")
-    public Post updatePost(@PathVariable Long id, @RequestBody Post post) {
-        post.setId(id);
-        return postService.updatePost(post);
+    @PostMapping(value = "updatePost", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<ApiResponseWrapper<Post>> updatePost(@RequestPart("post") String postJson,
+                           @RequestPart(value = "image", required = false) MultipartFile image
+    ) throws IOException {
+        ObjectMapper mapper = new ObjectMapper();
+        Post postRequest = mapper.readValue(postJson, Post.class);
+        Post updatedPost = postService.updatePost(postRequest.getId(), postRequest, image);
+        return ResponseBuilder.success(
+                updatedPost,
+                "Post Updated successfully",
+                HttpStatus.OK
+        );
     }
 
     @Operation(

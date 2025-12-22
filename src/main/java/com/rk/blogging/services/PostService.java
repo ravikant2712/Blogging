@@ -3,13 +3,16 @@ package com.rk.blogging.services;
 
 import com.rk.blogging.exceptions.PostNotFoundException;
 import com.rk.blogging.model.Post;
+import com.rk.blogging.model.User;
 import com.rk.blogging.repository.PostRepository;
+import com.rk.blogging.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -17,6 +20,7 @@ public class PostService {
 
 
     private final PostRepository postRepository;
+    private final UserRepository userRepository;
 
     public Post createPost(Post post) {
         post.setStatus(Post.Status.DRAFT);
@@ -37,8 +41,26 @@ public class PostService {
                 .orElseThrow(() -> new PostNotFoundException("Post not found with id: " + postId));
     }
 
-    public Post updatePost(Post post) {
-        return postRepository.save(post);
+    public Post updatePost(Long postId, Post post,MultipartFile image)   throws IOException{
+        Post updatePost = postRepository.findById(postId)
+                .orElseThrow(() -> new RuntimeException("Post not found"));
+
+        if(post !=null && post.getTitle() !=null){
+            updatePost.setTitle( post.getTitle());
+            updatePost.setSlug(updatePost.getSlug());
+        }
+        if(post !=null && post.getContent() !=null){
+            updatePost.setContent( post.getContent());
+        }
+        if(post !=null && post.getStatus() !=null){
+            updatePost.setStatus(post.getStatus());
+        }
+        if (image != null && !image.isEmpty()) {
+            updatePost.setImage(image.getBytes());
+            updatePost.setImageType(image.getContentType());
+        }
+
+        return postRepository.save(updatePost);
     }
 
     public void deletePost(Long id) {
