@@ -34,6 +34,7 @@ dependencies {
     implementation("io.swagger.core.v3:swagger-annotations:2.2.41")
     implementation("jakarta.servlet:jakarta.servlet-api:6.0.0")
     implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.5.0")
+    testImplementation("com.h2database:h2")
     compileOnly("org.projectlombok:lombok")
 	annotationProcessor("org.projectlombok:lombok")
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
