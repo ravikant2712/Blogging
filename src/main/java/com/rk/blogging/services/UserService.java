@@ -52,7 +52,7 @@ public class UserService {
         User registerUser  = userRepository.save(user);
         return ResponseBuilder.success(
                 registerUser,
-                "Login successfully",
+                "Register successfully",
                 HttpStatus.OK
         );
 
