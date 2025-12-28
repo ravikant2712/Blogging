@@ -1,0 +1,45 @@
+1.Spring Ioc Container
+2.Bean life-cycle ( Create → Inject → Initialize → Ready → Destroy )
+3.ApplicationContext works (Create IoC Container → Scan Packages → Create bean defination → Initiate beans → Resolve dependancies → Post Processing → Make bean available → Serving bean )
+4.Bean Scopes ()
+    a.@Scope (“singleton”)  only one object per spring container
+    b.@Scope (“prototype”)  a new object each time you call getBean()
+    c.@Scope (“request”) one bean instance per http request
+    d.@Scope (“session”) one bean instance per user session
+5.BeanPostProcessor (let you intercept beans before and after initialization )
+6.AOP (Aspect-oriented Programming) (AOP allow you to write code that should run before, after or around specific method - without modifying those method directly - @Aspect - apply on class , @Before(execution(“package name”)) - Run before every method in Aspect class  )
+7.@PostConstruct - Runs AFTER spring creates the bean
+8.Java Bases Configuration (configuring your spring application using java classes instead old xml )
+    a.@Configuration  -  This mark a class as a spring configuration class
+    b.@Bean - Create bean using methods
+    c.@ComponentScan(“com.example”) - Tell spring where to search for annotated bean - Auto - detect @Component beans (Automatically detect @component, @Service @Repository, @Controller)
+    d.Creating ApplicationContext  - Java config class instead of XML
+    e.@Import({DatabaseConfig.class, SecurityConfig.class}) - Combine multiple configuration classes
+    f.@PropertySource(“classpath:application.property”) -   Load property file and get by @Value(${app.name})
+9.@SpringBootApplication (@Configuration + @ComponentScan + @EnableAutoConfiguration) - Do automatic java based configuration
+10.@EnableAutoConfiguration  -  Tells Spring boot : automatically configure the application based on dependencies present on class path
+11.Annotation-Basesd Configuration (to define beans, inject dependencies, and configure the Spring container)
+    a.@Component - Mark a class as a spring managed bean
+    b.@Service/ @Repository/ @Controller/ @RestController  - Specialization of @Component
+                              - @Service - Used in service business logic layer
+                              - @Repository - Used in persistence layer (provide exception translation)
+                              - @Controller - Handle MVC web request
+                              - @RestController( @Controller + ResponseBody)
+    c.@Autowire (Dependany Injection) -   Inject a bean automatically  (Exp : Field Injection, Constructor Injection )
+    d.@Qualifier(“payment”)  - Use when multiple bean of same type exist
+    e.@Primary- tell the container if multiple bean of same type exist ,choose this one by default
+    f.@Scope - define bean scope
+    g.@Configuration + @Bean  - to define your own bean
+    h.@ComponentScan -  tell spring where to search for annotated bean
+    i.@PropertySource  - load property file
+    j.@Lasy - Do not create the bean immediately create it only when its needed
+
+12.How Annotation-Based Configuration Works Internally?
+When the application starts: 1. Spring scans packages Using @ComponentScan 2. Finds classes with annotations @Component, @Service, @Repository, @Controller 3. Creates bean definition - Stores class metadata 4. Instantiates the bean  - Creates objects 5. Injects dependencies - Handles @Autowired, @Qualifier 6. Applies bean life cycle annotations @PostConstruct, @PreDestroy 7. Registers bean in IoC container Stored in bean map
+
+13.DI in Spring - Spring creates the object your class needs(dependencies) and inject them instead of you creating them manually.
+    a.Constructor Injection
+    b.Setter Injection
+    c.Field Injection
+    d.
+14.@EventListener  - Listen the application event
