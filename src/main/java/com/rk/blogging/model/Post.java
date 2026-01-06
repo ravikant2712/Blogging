@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 
 import java.text.Normalizer;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Locale;
 import java.util.regex.Pattern;
 
@@ -44,6 +45,9 @@ public class Post {
     private String imageType; // image/png, image/jpeg
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
+
+    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Comment> comments;
 
     public enum Status {
         DRAFT, PUBLISHED, REJECTED

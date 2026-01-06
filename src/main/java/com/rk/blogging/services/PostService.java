@@ -1,9 +1,11 @@
 package com.rk.blogging.services;
 
 
+import com.rk.blogging.dto.PostResponse;
 import com.rk.blogging.exceptions.PostNotFoundException;
 import com.rk.blogging.model.Post;
 import com.rk.blogging.model.User;
+import com.rk.blogging.repository.PostMapper;
 import com.rk.blogging.repository.PostRepository;
 import com.rk.blogging.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -18,7 +20,6 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class PostService {
 
-
     private final PostRepository postRepository;
     private final UserRepository userRepository;
 
@@ -29,6 +30,15 @@ public class PostService {
 
     public List<Post> getAllPosts() {
         return postRepository.findAll();
+    }
+
+
+    public List<PostResponse> getAllPostsWithComments() {
+
+        return postRepository.findAllWithComments()
+                .stream()
+                .map(PostMapper::toPostResponse)
+                .toList();
     }
 
     public Post getPostBySlug(String slug) {
@@ -43,23 +53,27 @@ public class PostService {
 
     public Post updatePost(Long postId, Post post,MultipartFile image)   throws IOException{
         Post updatePost = postRepository.findById(postId)
-                .orElseThrow(() -> new RuntimeException("Post not found"));
+                .orElseThrow(() -> new PostNotFoundException("Post not found"));
 
-        if(post !=null && post.getTitle() !=null){
-            updatePost.setTitle( post.getTitle());
-            updatePost.setSlug(updatePost.getSlug());
+        try{
+            if(post !=null && post.getTitle() !=null){
+                updatePost.setTitle( post.getTitle());
+                updatePost.setSlug(updatePost.getSlug());
+            }
+            if(post !=null && post.getContent() !=null){
+                updatePost.setContent( post.getContent());
+            }
+            if(post !=null && post.getStatus() !=null){
+                updatePost.setStatus(post.getStatus());
+            }
+            if (image != null && !image.isEmpty()) {
+                updatePost.setImage(image.getBytes());
+                updatePost.setImageType(image.getContentType());
+            }
+        }catch (Exception e)
+        {
+            throw  new PostNotFoundException("Unable to update the Status, Please try again");
         }
-        if(post !=null && post.getContent() !=null){
-            updatePost.setContent( post.getContent());
-        }
-        if(post !=null && post.getStatus() !=null){
-            updatePost.setStatus(post.getStatus());
-        }
-        if (image != null && !image.isEmpty()) {
-            updatePost.setImage(image.getBytes());
-            updatePost.setImageType(image.getContentType());
-        }
-
         return postRepository.save(updatePost);
     }
 

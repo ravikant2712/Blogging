@@ -2,12 +2,11 @@ package com.rk.blogging.controller;
 
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.rk.blogging.dto.ApiResponseWrapper;
-import com.rk.blogging.dto.LoginRequest;
-import com.rk.blogging.dto.PostRequest;
-import com.rk.blogging.dto.SlugRequest;
+import com.rk.blogging.dto.*;
+import com.rk.blogging.model.Comment;
 import com.rk.blogging.model.Post;
 import com.rk.blogging.model.User;
+import com.rk.blogging.services.CommentService;
 import com.rk.blogging.services.PostService;
 import com.rk.blogging.services.UserService;
 import com.rk.blogging.utils.ResponseBuilder;
@@ -31,6 +30,7 @@ import java.util.List;
 @Tag(name = "Posts", description = "Blog post CRUD APIs")
 public class PostController {
 
+    private final CommentService commentService;
     private final PostService postService;
     private final UserService authService;
 
@@ -39,8 +39,8 @@ public class PostController {
             description = "Returns list of all published posts"
     )
     @GetMapping
-    public ResponseEntity<ApiResponseWrapper<List<Post>>> getAllPosts() {
-        List<Post> list = postService.getAllPosts();
+    public ResponseEntity<ApiResponseWrapper<List<PostResponse>>> getAllPosts() {
+        List<PostResponse> list = postService.getAllPostsWithComments();
         return ResponseBuilder.success(
                 list,
                 "Post Lists",
@@ -139,5 +139,45 @@ public class PostController {
     @DeleteMapping("/{id}")
     public void deletePost(@PathVariable Long id) {
         postService.deletePost(id);
+    }
+
+
+    @Operation(
+            summary = "Create comment on post",
+            security = @SecurityRequirement(name = "bearerAuth")
+    )
+    @PostMapping("/comment")
+    public ResponseEntity<ApiResponseWrapper<Comment>> createComment(
+            @Valid @RequestBody CommentRequest request
+    ) {
+
+        User user = authService.getCurrentUser(); // logged-in user
+        Comment savedComment = commentService.createComment(request, user);
+
+        return ResponseBuilder.success(
+                savedComment,
+                "Comment added successfully",
+                HttpStatus.OK
+        );
+    }
+
+
+    @Operation(
+            summary = "Reply to a comment",
+            security = @SecurityRequirement(name = "bearerAuth")
+    )
+    @PostMapping("/comment/reply")
+    public ResponseEntity<ApiResponseWrapper<Comment>> replyToComment(
+            @Valid @RequestBody ReplyCommentRequest request
+    ) {
+        User user = authService.getCurrentUser();
+
+        Comment reply = commentService.replyToComment(request, user);
+
+        return ResponseBuilder.success(
+                reply,
+                "Reply added successfully",
+                HttpStatus.OK
+        );
     }
 }

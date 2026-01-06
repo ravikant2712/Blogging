@@ -96,4 +96,27 @@ public class GlobalExceptionHandler {
         );
     //    return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
     }
+
+
+    @ExceptionHandler(HandleRuntimeException.class)
+    public ResponseEntity<ApiResponseWrapper<Void>> handleRuntimeException(
+            HandleRuntimeException ex,
+            HttpServletRequest request
+    ) {
+
+        Map<String, String> errors = new HashMap<>();
+
+        ApiError apiError = ApiError.builder()
+                .errorCode(String.valueOf(HttpStatus.NOT_FOUND.value()))
+                .errorMessage(HttpStatus.NOT_FOUND.name())
+                .fieldErrors(errors)
+                .build();
+
+        return ResponseBuilder.failure(
+                apiError,
+                ex.getMessage(),
+                HttpStatus.NOT_FOUND
+        );
+        //    return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
+    }
 }

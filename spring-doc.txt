@@ -1,4 +1,11 @@
-1.Spring Ioc Container
+1.Spring Ioc Container -
+    Spring IoC is a design principle where the control of object creation and lifecycle is transferred
+    from the developer to the framework.
+    The IoC container is responsible for:
+    a. Creating objects (Beans)
+    b. Configuring dependencies via Dependency Injection (DI)
+    c. Managing the entire lifecycle of beans, from instantiation to destruction
+    d. Reading configuration metadata (XML, Java Config, or Annotations)
 2.Bean life-cycle ( Create → Inject → Initialize → Ready → Destroy )
 3.ApplicationContext works (Create IoC Container → Scan Packages → Create bean defination → Initiate beans → Resolve dependancies → Post Processing → Make bean available → Serving bean )
 4.Bean Scopes ()
@@ -7,7 +14,8 @@
     c.@Scope (“request”) one bean instance per http request
     d.@Scope (“session”) one bean instance per user session
 5.BeanPostProcessor (let you intercept beans before and after initialization )
-6.AOP (Aspect-oriented Programming) (AOP allow you to write code that should run before, after or around specific method - without modifying those method directly - @Aspect - apply on class , @Before(execution(“package name”)) - Run before every method in Aspect class  )
+6.AOP (Aspect-oriented Programming) (AOP allow you to write code that should run before, after or around
+specific method - without modifying those method directly - @Aspect - apply on class , @Before(execution(“package name”)) - Run before every method in Aspect class  )
 7.@PostConstruct - Runs AFTER spring creates the bean
 8.Java Bases Configuration (configuring your spring application using java classes instead old xml )
     a.@Configuration  -  This mark a class as a spring configuration class
@@ -35,7 +43,13 @@
     j.@Lasy - Do not create the bean immediately create it only when its needed
 
 12.How Annotation-Based Configuration Works Internally?
-When the application starts: 1. Spring scans packages Using @ComponentScan 2. Finds classes with annotations @Component, @Service, @Repository, @Controller 3. Creates bean definition - Stores class metadata 4. Instantiates the bean  - Creates objects 5. Injects dependencies - Handles @Autowired, @Qualifier 6. Applies bean life cycle annotations @PostConstruct, @PreDestroy 7. Registers bean in IoC container Stored in bean map
+   When the application starts:
+   1. Spring scans packages Using @ComponentScan
+   2. Finds classes with annotations @Component,@Service,@Repository,@Controller
+   3. Creates bean definition - Stores class metadata 4. Instantiates the bean  - Creates objects
+   5. Injects dependencies - Handles @Autowired,@Qualifier
+   6. Applies bean life cycle annotations @PostConstruct,@PreDestroy
+   7. Registers bean in IoC container Stored in bean map
 
 13.DI in Spring - Spring creates the object your class needs(dependencies) and inject them instead of you creating them manually.
     a.Constructor Injection
@@ -43,3 +57,8 @@ When the application starts: 1. Spring scans packages Using @ComponentScan 2. F
     c.Field Injection
     d.
 14.@EventListener  - Listen the application event
+15. @JsonIgnore  //Prevent Infinite JSON Loop for OneTOMany, ManyTOOne
+16. N+1 Problem - The N+1 problem occurs when an ORM executes one query to fetch parent entities
+    and additional queries for each parent to fetch related entities, leading to serious performance issues.
+    Q: How do you solve N+1 in Spring Boot?
+    A: Using JOIN FETCH, @EntityGraph, or DTO projections.
