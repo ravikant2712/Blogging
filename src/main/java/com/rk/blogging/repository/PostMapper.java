@@ -1,9 +1,13 @@
 package com.rk.blogging.repository;
 
+import com.rk.blogging.dto.CategoryResponse;
 import com.rk.blogging.dto.CommentResponse;
 import com.rk.blogging.dto.PostResponse;
+import com.rk.blogging.dto.SubCategoryResponse;
+import com.rk.blogging.model.Category;
 import com.rk.blogging.model.Comment;
 import com.rk.blogging.model.Post;
+import com.rk.blogging.model.SubCategory;
 
 import java.util.List;
 
@@ -21,14 +25,33 @@ public class PostMapper {
         response.setStatus(post.getStatus() != null
                 ? post.getStatus().name()
                 : null);
+        if (post.getSubCategory() != null) {
+            SubCategory sc = post.getSubCategory();
+            Category c = sc.getCategory();
 
-        List<CommentResponse> comments =
+            response.setSubCategory(
+                    new SubCategoryResponse(
+                            sc.getId(),
+                            sc.getName(),
+                            c.getId()
+                    )
+            );
+
+            response.setCategory(
+                    new CategoryResponse(
+                            c.getId(),
+                            c.getName()
+                    )
+            );
+        }
+
+    /*    List<CommentResponse> comments =
                 post.getComments()
                         .stream()
                         .map(PostMapper::toCommentResponse)
-                        .toList();
+                        .toList();*/
 
-        response.setComments(comments);
+   //     response.setComments(comments);
 
         return response;
     }

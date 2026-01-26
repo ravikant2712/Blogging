@@ -8,5 +8,7 @@ public class PostRequest {
     Long id;
     private String title;
     private String content;
+    private Long subCategoryId;
     private Post.Status status;
+    
 }

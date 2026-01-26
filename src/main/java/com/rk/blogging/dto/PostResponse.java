@@ -13,5 +13,7 @@ public class PostResponse {
     private byte[] image;
     private String imageType; // image/png, image/jpeg
     private String status;
-    private List<CommentResponse> comments;
+    private CategoryResponse category;
+    private SubCategoryResponse subCategory;
+   // private List<CommentResponse> comments;
 }

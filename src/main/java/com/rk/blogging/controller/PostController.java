@@ -5,9 +5,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rk.blogging.dto.*;
 import com.rk.blogging.model.Comment;
 import com.rk.blogging.model.Post;
+import com.rk.blogging.model.SubCategory;
 import com.rk.blogging.model.User;
 import com.rk.blogging.services.CommentService;
 import com.rk.blogging.services.PostService;
+import com.rk.blogging.services.SubCategoryService;
 import com.rk.blogging.services.UserService;
 import com.rk.blogging.utils.ResponseBuilder;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -15,6 +17,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -33,12 +36,27 @@ public class PostController {
     private final CommentService commentService;
     private final PostService postService;
     private final UserService authService;
+    private final SubCategoryService subCategoryService;
 
     @Operation(
             summary = "Get all posts",
-            description = "Returns list of all published posts"
+            description = "Returns list of all published posts",
+            security = @SecurityRequirement(name = "bearerAuth")
     )
     @GetMapping
+    public ResponseEntity<ApiResponseWrapper<List<PostResponse>>> getAllPosts(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "createdAt") String sortBy,
+            @RequestParam(defaultValue = "desc") String sortDir
+    ) {
+        return ResponseBuilder.success(
+                postService.getAllPostsWithComments(page, size, sortBy, sortDir),
+                "Posts fetched successfully",
+                HttpStatus.OK
+        );
+    }
+/*    @GetMapping
     public ResponseEntity<ApiResponseWrapper<List<PostResponse>>> getAllPosts() {
         List<PostResponse> list = postService.getAllPostsWithComments();
         return ResponseBuilder.success(
@@ -46,11 +64,12 @@ public class PostController {
                 "Post Lists",
                 HttpStatus.OK
         );
-    }
+    }*/
 
     @Operation(
             summary = "Get post by slug",
-            description = "Fetch a blog post using SEO-friendly slug"
+            description = "Fetch a blog post using SEO-friendly slug",
+            security = @SecurityRequirement(name = "bearerAuth")
     )
     @PostMapping("/getPostBySlug")
     public ResponseEntity<ApiResponseWrapper<Post>> getPostBySlug(@RequestBody SlugRequest request) {
@@ -64,7 +83,8 @@ public class PostController {
 
     @Operation(
             summary = "Get post by ID",
-            description = "Fetch a blog post by ID"
+            description = "Fetch a blog post by ID",
+            security = @SecurityRequirement(name = "bearerAuth")
     )
     @PostMapping("/getPostById")
     public ResponseEntity<ApiResponseWrapper<Post>> getPostByID(@RequestBody PostRequest request) {
@@ -90,7 +110,7 @@ public class PostController {
 
         ObjectMapper mapper = new ObjectMapper();
         PostRequest postRequest = mapper.readValue(postJson, PostRequest.class);
-
+        SubCategory subCategory = subCategoryService.findSubCategoryById(postRequest.getSubCategoryId());
         User user = authService.getCurrentUser(); // logged-in user
 
         Post post = Post.builder()
@@ -98,6 +118,7 @@ public class PostController {
                 .content(postRequest.getContent())
                 .status(postRequest.getStatus())
                 .userId(user.getId())
+                .subCategory(subCategory)
                 .build();
 
         if (image != null && !image.isEmpty()) {

@@ -9,9 +9,12 @@ import com.rk.blogging.repository.PostMapper;
 import com.rk.blogging.repository.PostRepository;
 import com.rk.blogging.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.awt.print.Pageable;
 import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
@@ -33,9 +36,13 @@ public class PostService {
     }
 
 
-    public List<PostResponse> getAllPostsWithComments() {
+    public List<PostResponse> getAllPostsWithComments(int page, int size, String sortBy, String sortDir) {
+        Sort sort = sortDir.equalsIgnoreCase("desc")
+                ? Sort.by(sortBy).descending()
+                : Sort.by(sortBy).ascending();
 
-        return postRepository.findAllWithComments()
+        PageRequest pageable = PageRequest.of(page, size, sort);
+        return postRepository.findAll(pageable)
                 .stream()
                 .map(PostMapper::toPostResponse)
                 .toList();

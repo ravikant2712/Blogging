@@ -1,0 +1,198 @@
+Spring Framework - Spring framework is an open source Java platform that provides comprehensive infrastructure
+         support for developing robust Java applications very easily and very rapidly
+         - By Rod Johnson
+Why to learn Spring
+      - open source
+      - lightweight - The basic version of Spring framework is around 2MB.
+      - The core features of the Spring Framework can be used in developing any Java application, but there are
+        extensions for building web applications on top of the Java EE platform.
+        Spring framework targets to make J2EE development easier to use and promotes good programming practices
+        by enabling a POJO-based programming model.
+Applications / Benefits of Spring Framework
+      - Pojo Based - Spring enables developers to develop enterprise-class applications using POJOs instead of
+                  heavy EJB Container product.
+                  Benefits - Easy to develop, test, and maintain applications.
+
+      - Modular - Spring is designed in a modular way.
+                  You can use only what you need:
+                  Spring Core, Spring MVC, Spring JDBC, Spring Security
+                  No need to learn or include everything
+                  Benefits - Reduces complexity and improves performance.
+
+      - Integration with existing framework -
+                  Spring easily integrates with existing technologies instead of replacing them.
+                      ORM: Hibernate, JPA, MyBatis
+                      Logging: Log4j, SLF4J
+                      Scheduling: Quartz
+                      View technologies: JSP, Thymeleaf
+                  Benefits : Flexible and future-proof architecture.
+
+      - Testability - Spring makes applications easy to test.
+                      Business logic is separated from environment-dependent code
+                      Supports Dependency Injection (DI)
+                      Benefit : Unit testing becomes simple.
+      - WebMVC - Spring provides a powerful MVC (Model-View-Controller) framework.
+                 Clean separation of:
+                     Model (data)
+                     View (UI)
+                     Controller (logic)
+                 Better than older frameworks like Struts
+                 Benefit: Clean, maintainable, and scalable web applications.
+      - Central Exception Handling
+                 Spring provides uniform exception handling.
+                     Converts technology-specific exceptions (JDBC, Hibernate)
+                     Converts them into unchecked, consistent exceptions
+                 Benefit : Cleaner code and easier error management.
+                 Example:
+                 @ControllerAdvice for global exception handling.
+      - Lightweight - Lightweight IoC containers tend to be lightweight, especially when compared to EJB
+                      containers, for example. This is beneficial for developing and deploying applications
+                      on computers with limited memory and CPU resources.
+                      Benefits : Ideal for microservices and cloud applications.
+      - Transaction Management
+                      Spring provides a consistent transaction management interface that can scale down to a
+                      local transaction (using a single database, for example) and scale up to global
+                      transactions (using JTA, for example).
+
+Type Of Container in Spring
+      - BeanFactory Container - This is the simplest container providing the basic support for DI
+        The BeanFactory and related interfaces, such as BeanFactoryAware, InitializingBean, DisposableBean,
+        are still present in Spring for the purpose of backward compatibility with a large number of
+        third-party frameworks that integrate with Spring.
+
+      - Application Context Container - This container adds more enterprise-specific functionality such as the
+        ability to resolve textual messages from a properties file and the ability to publish application
+        events to interested event listeners.
+
+      The ApplicationContext container includes all functionality of the BeanFactorycontainer,
+      so it is generally recommended over BeanFactory.
+
+Key Difference in Architecture
+        Aspect	          Spring	                    Spring Boot
+        Server	          External (Tomcat, WebLogic)	Embedded (Tomcat/Jetty)
+        Configuration	  Manual (XML / Java)	        Auto-configured
+        Setup	          Complex	                    Quick, minimal
+        Modules	          Use what you need	            Auto-loads modules based on dependencies
+        Deployment	      WAR	                        Standalone JAR
+
+Bean Definition - is the metadata (information) that tells the Spring IoC container:
+        What object to create
+        How to create it
+        When to create it
+        How long it should live
+        How to inject dependencies
+
+Spring Configuration Metadata
+        XML based configuration file.
+        Annotation-based configuration.
+        Java-based configuration.
+
+Bean Scope - When defining a <bean> you have the option of declaring a scope for that bean.
+        singleton  - single instance per Spring IOC Container
+        prototype  -
+        request
+        session
+        global-session
+
+Bean LifeCycle - Spring Bean Life Cycle defines the stages from bean creation, dependency injection,
+                 initialization, usage, to destruction by the IoC container.
+        - init-method - run for initialization  , InitializingBean interface
+        - destroy-method - run before destroy  , DisposableBean Interface
+
+BeanPostProcessor - RUN Before and After initialization - BeanPostProcessor interface defines callback methods
+        that you can implement to provide your own instantiation logic, dependency-resolution logic etc
+        - You can configure multiple BeanPostProcessor interfaces and you can control the order in which
+         these BeanPostProcessor interfaces execute by setting the order property provided the BeanPostProcessor
+         implements the Ordered interface.
+
+       - An ApplicationContext automatically detects any beans that are defined with the implementation of the
+        BeanPostProcessor interface and registers these beans as postprocessors, to be then called
+        appropriately by the container upon bean creation
+       - postProcessBeforeInitialization
+       - postProcessAfterInitialization
+
+Bean Definition Inheritance -Spring Bean definition inheritance has nothing to do with Java class inheritance
+       but the inheritance concept is same. You can define a parent bean definition as a template and other
+       child beans can inherit the required configuration from the parent bean.
+       - When you use XML-based configuration metadata, you indicate a child bean definition by using the parent
+       attribute, specifying the parent bean as the value of this attribute.
+          <bean id = "helloWorld" class = "com.tutorialspoint.HelloWorld">
+             <property name = "message1" value = "Hello World!"/>
+             <property name = "message2" value = "Hello Second World!"/>
+          </bean>
+          <bean id ="helloIndia" class = "com.tutorialspoint.HelloIndia" parent = "helloWorld">
+             <property name = "message1" value = "Hello India!"/>
+             <property name = "message3" value = "Namaste India!"/>
+          </bean>
+
+Dependency Injection - Every Java-based application has a few objects that work together to present what the end-user
+       sees as a working application. When writing a complex Java application, application classes should
+       be as independent as possible of other Java classes to increase the possibility to reuse these classes
+       and to test them independently of other classes while unit testing.Dependency Injection (or sometime called wiring)
+       helps in gluing these classes together and at the same time keeping them independent.
+       Type of DI
+       - Constructor - based DI
+       - Setter - based DI
+
+Injecting Inner Bean - inner beans are beans that are defined within the scope of another bean. Thus, a <bean/> element
+       inside the <property/> or <constructor-arg/> elements is called inner bean
+       <bean id = "outerBean" class = "...">
+             <property name = "target">
+                <bean id = "innerBean" class = "..."/>
+             </property>
+       </bean>
+
+Injecting Collections In Bean -
+        To configure primitive data type using value attribute and object references using ref attribute of the <property>
+        tag in your Bean configuration file for singular value.
+        For Primitive
+        <bean id="student" class="com.example.Student">
+            <property name="id" value="101"/>
+            <property name="name" value="Ravi"/>
+            <property name="active" value="true"/>
+        </bean>
+        For Object use ref like :
+        <bean id="addressBean" class="com.example.Address">
+            <property name="city" value="Chandigarh"/>
+            <property name="state" value="Punjab"/>
+        </bean>
+
+        <bean id="employeeBean" class="com.example.Employee">
+            <property name="empId" value="501"/>
+            <property name="empName" value="Amit"/>
+            <property name="address" ref="addressBean"/>
+        </bean>
+        To pass plural values like Java Collection types such as List, Set, Map, and Properties.
+        Spring offers four types of collection configuration elements which are as follows
+        <list>,
+                <property name = "addressList">
+                     <list>
+                        <value>INDIA</value>
+                        <value>Pakistan</value>
+                     </list>
+                </property>
+        <set>,
+                <property name = "addressSet">
+                     <set>
+                        <value>INDIA</value>
+                        <value>Pakistan</value>
+                     </set>
+                </property>
+        <map>,
+                <property name = "addressMap">
+                     <map>
+                        <entry key = "1" value = "INDIA"/>
+                        <entry key = "2" value = "Pakistan"/>
+                     </map>
+                </property>
+        <props>
+                <property name = "addressProp">
+                     <props>
+                        <prop key = "one">INDIA</prop>
+                        <prop key = "two">Pakistan</prop>
+                     </props>
+                </property>
+
+
+
+

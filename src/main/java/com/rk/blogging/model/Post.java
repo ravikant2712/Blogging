@@ -1,5 +1,6 @@
 package com.rk.blogging.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -38,6 +39,11 @@ public class Post {
     @Enumerated(EnumType.STRING)
     private Status status;
 
+    @JsonIgnore
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "sub_category_id")
+    private SubCategory subCategory;
+
     @Lob
     @Column(columnDefinition = "LONGBLOB")
     private byte[] image;
@@ -46,8 +52,8 @@ public class Post {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
-    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Comment> comments;
+ //   @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
+ //   private List<Comment> comments;
 
     public enum Status {
         DRAFT, PUBLISHED, REJECTED
