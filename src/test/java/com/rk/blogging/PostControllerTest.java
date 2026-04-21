@@ -7,7 +7,9 @@ import com.rk.blogging.dto.PostRequest;
 import com.rk.blogging.dto.SlugRequest;
 import com.rk.blogging.model.Post;
 import com.rk.blogging.model.User;
+import com.rk.blogging.services.CommentService;
 import com.rk.blogging.services.PostService;
+import com.rk.blogging.services.SubCategoryService;
 import com.rk.blogging.services.UserService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,20 +40,32 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
                 type = FilterType.ASSIGNABLE_TYPE,
                 classes = JwtAuthenticationFilter.class
         )
-)
-@AutoConfigureMockMvc
+)    // loads only controller layer
+
+// @AutoConfigureMockMvc → sets up MockMvc
+//Lets you test APIs without running server
+//Works with Spring Security (by default)
+//Used mainly with @SpringBootTest
+//Optional with @WebMvcTest
+@AutoConfigureMockMvc    // Loads FULL application    ✔ Real services + DB (if configured)
 public class PostControllerTest {
 
-    @Autowired
-    private MockMvc mockMvc;
+    @Autowired   // inject dependency
+    private MockMvc mockMvc;    //This is fake http client Created by  @WebMvcTest or @SpringBootTest or @AutoConfigureMockMvc
 
-    @MockBean
+    @MockBean    //Create a FAKE version of a Spring bean and put it in the context    //Don’t use the real PostService, use a mock instead.
     private PostService postService;
     @MockBean
     private UserService authService;
 
     @Autowired
     private ObjectMapper objectMapper;
+
+    @MockBean
+    private CommentService commentService;
+
+    @MockBean
+    private SubCategoryService subCategoryService;
 
     // ---------- PUBLIC APIs ----------
 
@@ -137,7 +151,8 @@ public class PostControllerTest {
 
         mockMvc.perform(multipart("/api/posts")
                         .file(postJson)
-                        .contentType(MediaType.MULTIPART_FORM_DATA))
+                        .contentType(MediaType.MULTIPART_FORM_DATA)
+                        .with(csrf()))
                 .andExpect(status().isOk())
             //    .andExpect(jsonPath("$.data.title").value("Created"));
                 .andExpect(jsonPath("$.status").value("SUCCESS"))
@@ -145,7 +160,7 @@ public class PostControllerTest {
     }
 
     @Test
-    @WithMockUser(username = "ravi", roles = "USER")
+    @WithMockUser(username = "ravikant2712@gmail.com", roles = "USER")
     void updatePost_withAuth_shouldUpdatePost() throws Exception {
 
         Post post = Post.builder().id(1L).title("Updated").build();
@@ -163,6 +178,7 @@ public class PostControllerTest {
 
         mockMvc.perform(multipart("/api/posts/updatePost")
                         .file(postJson)
+                        .with(csrf())
                         .with(request -> {
                             request.setMethod("POST");
                             return request;
@@ -174,12 +190,12 @@ public class PostControllerTest {
     }
 
     @Test
-    @WithMockUser(username = "ravi", roles = "USER")
+    @WithMockUser(username = "ravikant2712@gmail.com", roles = "USER")
     void deletePost_withAuth_shouldDelete() throws Exception {
 
         doNothing().when(postService).deletePost(1L);
 
-        mockMvc.perform(delete("/api/posts/{id}", 1))
+        mockMvc.perform(delete("/api/posts/{id}", 1).with(csrf()))
                 .andExpect(status().isOk());
     }
 
@@ -197,7 +213,7 @@ public class PostControllerTest {
                 );
 
         mockMvc.perform(multipart("/api/posts")
-                        .file(postJson))
+                        .file(postJson).with(csrf()))
                 .andExpect(status().isUnauthorized());
     }
 }

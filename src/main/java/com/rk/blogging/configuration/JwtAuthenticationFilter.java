@@ -1,8 +1,6 @@
 package com.rk.blogging.configuration;
 
 
-import com.rk.blogging.exceptions.PostNotFoundException;
-import com.rk.blogging.exceptions.TokenExceptions;
 import com.rk.blogging.services.CustomUserDetailsService;
 import com.rk.blogging.utils.JWTUtils;
 import io.jsonwebtoken.ExpiredJwtException;
@@ -12,6 +10,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -21,6 +20,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
@@ -42,7 +42,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 || path.startsWith("/v3/api-docs")
                 || path.startsWith("/swagger-resources")
                 || path.startsWith("/webjars")
-                || path.startsWith("/api/auth")) {
+                || path.startsWith("/api/auth")
+        ) {
             filterChain.doFilter(request, response);
             return;
         }
@@ -86,9 +87,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }catch (ExpiredJwtException e)
         {
          //  throw  new TokenExceptions("Token Expired!");
+            log.warn("JWT expired: {}", e.getMessage());
             handleJwtException(response, "JWT token has expired");
             return;
         } catch (JwtException | IllegalArgumentException ex) {
+            log.error("Invalid JWT: {}", ex.getMessage());
             handleJwtException(response, "Invalid JWT token");
             return;
         }

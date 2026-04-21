@@ -12,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.awt.print.Pageable;
@@ -21,11 +22,13 @@ import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)  // Whole class is read only
 public class PostService {
 
     private final PostRepository postRepository;
     private final UserRepository userRepository;
 
+    @Transactional   // To make rollback
     public Post createPost(Post post) {
         post.setStatus(Post.Status.DRAFT);
         return postRepository.save(post);
@@ -58,6 +61,7 @@ public class PostService {
                 .orElseThrow(() -> new PostNotFoundException("Post not found with id: " + postId));
     }
 
+    @Transactional
     public Post updatePost(Long postId, Post post,MultipartFile image)   throws IOException{
         Post updatePost = postRepository.findById(postId)
                 .orElseThrow(() -> new PostNotFoundException("Post not found"));
@@ -84,6 +88,21 @@ public class PostService {
         return postRepository.save(updatePost);
     }
 
+    @Transactional
+    public void updatePostWithError(Long id, Post post, MultipartFile file) {
+
+        Post existing = postRepository.findById(id)
+                .orElseThrow();
+
+        existing.setTitle(post.getTitle());
+
+        // 💥 force failure AFTER update
+        if (true) throw new RuntimeException("Force rollback");
+
+        postRepository.save(existing);
+    }
+
+    @Transactional
     public void deletePost(Long id) {
         postRepository.deleteById(id);
     }
@@ -92,6 +111,8 @@ public class PostService {
         return postRepository.findByUserId(userId);
     }
 
+
+    @Transactional
     public Post uploadPostImage(Long postId, MultipartFile file) throws IOException {
 
         Post post = postRepository.findById(postId)

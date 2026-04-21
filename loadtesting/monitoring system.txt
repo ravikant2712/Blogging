@@ -1,0 +1,8 @@
+TOOLS
+Grafana, Loki, Promethious
+
+                   Monitoring
+
+ Matrics(Number)           Log Collection(log)
+
+Setup Promethous

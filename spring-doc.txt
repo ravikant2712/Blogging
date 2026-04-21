@@ -26,7 +26,7 @@ specific method - without modifying those method directly - @Aspect - apply on c
     f.@PropertySource(“classpath:application.property”) -   Load property file and get by @Value(${app.name})
 9.@SpringBootApplication (@Configuration + @ComponentScan + @EnableAutoConfiguration) - Do automatic java based configuration
 10.@EnableAutoConfiguration  -  Tells Spring boot : automatically configure the application based on dependencies present on class path
-11.Annotation-Basesd Configuration (to define beans, inject dependencies, and configure the Spring container)
+11.Annotation-Based Configuration (to define beans, inject dependencies, and configure the Spring container)
     a.@Component - Mark a class as a spring managed bean
     b.@Service/ @Repository/ @Controller/ @RestController  - Specialization of @Component
                               - @Service - Used in service business logic layer

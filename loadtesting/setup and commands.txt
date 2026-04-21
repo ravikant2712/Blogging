@@ -1,0 +1,45 @@
+installation on window
+1. open powershell as administration
+2. install choco
+3. run command to install :-
+    Set-ExecutionPolicy Bypass -Scope Process -Force;
+    [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072;
+    iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
+
+
+    //Use Actuator  TO monitor CPU, Memory(heap), Thread, GC
+    implementation("org.springframework.boot:spring-boot-starter-actuator")
+
+    url
+    "value": 0.35
+    ✔ Means: 35% CPU usage
+    http://localhost:8080/actuator/metrics/system.cpu.usage
+
+    Compare:
+    used vs max → tells if memory is under pressure
+    http://localhost:8080/actuator/metrics/jvm.memory.used
+    http://localhost:8080/actuator/metrics/jvm.memory.max
+
+    "value": 120
+    ✔ Means 120 active threads
+    http://localhost:8080/actuator/metrics/jvm.threads.live
+
+    Shows:
+    GC pause time
+    frequency
+    ✔ High values = performance problem
+    http://localhost:8080/actuator/metrics/jvm.gc.pause
+
+
+    What GOOD vs BAD looks like
+    Metric	    Good	    Bad
+    CPU	        <70%	    90–100% 🔥
+    Memory	    stable	    keeps increasing 📈
+    Threads	    stable	    keeps growing ❌
+    GC	        occasional	frequent pauses ❌
+
+
+
+
+Commands
+k6 run "C:\Users\Lalit Mohan\IdeaProjects\Blogging\loadtesting\getpost-test.js"

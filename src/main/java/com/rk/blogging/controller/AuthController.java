@@ -21,11 +21,12 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
-@Slf4j
-@RestController
-@RequestMapping("/api/auth")
-@RequiredArgsConstructor
-@Tag(name = "Authentication", description = "User authentication APIs")
+@Slf4j   //Used for logging purpose
+@RestController    // @RestController - This tells Spring: This class handles HTTP requests ,
+// All methods return JSON (not views)   @Controller + @ResponseBody
+@RequestMapping("/api/auth")   //Base Url
+@RequiredArgsConstructor    //Also from Lombok. It automatically creates a constructor for all final fields: here AuthenticationManager, UserService, JWTUtils
+@Tag(name = "Authentication", description = "User authentication APIs")   // This is for Swagger / OpenAPI documentation.
 public class AuthController {
 
     private final AuthenticationManager authenticationManager;
@@ -53,8 +54,7 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<ApiResponseWrapper<String>> login(@RequestBody LoginRequest request) {
 
-        System.out.println("Login attempt for user: " + request.getUsername());
-        Authentication authentication = authenticationManager.authenticate(
+         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
                         request.getUsername(),
                         request.getPassword()
@@ -62,7 +62,7 @@ public class AuthController {
         );
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
-        System.out.println("Login attempt for user: " + request.getUsername());
+        log.info(request.getUsername());
         String token = jwtUtil.generateToken(request.getUsername());
         return ResponseBuilder.success(
                 token,

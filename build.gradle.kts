@@ -35,6 +35,11 @@ dependencies {
     implementation("io.swagger.core.v3:swagger-annotations:2.2.41")
     implementation("jakarta.servlet:jakarta.servlet-api:6.0.0")
     implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.5.0")
+
+    // Actuator and Prometheus  TO monitor CPU, Memory(heap), Thread, GC
+    implementation ("io.micrometer:micrometer-registry-prometheus")
+    implementation("org.springframework.boot:spring-boot-starter-actuator")
+
     testImplementation("com.h2database:h2")
     compileOnly("org.projectlombok:lombok")
 	annotationProcessor("org.projectlombok:lombok")

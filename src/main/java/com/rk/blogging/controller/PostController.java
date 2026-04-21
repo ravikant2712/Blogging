@@ -3,14 +3,8 @@ package com.rk.blogging.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rk.blogging.dto.*;
-import com.rk.blogging.model.Comment;
-import com.rk.blogging.model.Post;
-import com.rk.blogging.model.SubCategory;
-import com.rk.blogging.model.User;
-import com.rk.blogging.services.CommentService;
-import com.rk.blogging.services.PostService;
-import com.rk.blogging.services.SubCategoryService;
-import com.rk.blogging.services.UserService;
+import com.rk.blogging.model.*;
+import com.rk.blogging.services.*;
 import com.rk.blogging.utils.ResponseBuilder;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.Operation;
@@ -26,6 +20,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/posts")
@@ -37,6 +32,7 @@ public class PostController {
     private final PostService postService;
     private final UserService authService;
     private final SubCategoryService subCategoryService;
+    private final IdempotencyService idempotencyService;
 
     @Operation(
             summary = "Get all posts",
@@ -105,10 +101,66 @@ public class PostController {
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<ApiResponseWrapper<Post>> createPost(
             @RequestPart("post") String postJson,
+            @RequestHeader("Idempotency-Key") String key,
             @RequestPart(value = "image", required = false) MultipartFile image
     ) throws IOException {
 
         ObjectMapper mapper = new ObjectMapper();
+        PostRequest postRequest = mapper.readValue(postJson, PostRequest.class);
+
+        String requestHash = idempotencyService.generateHash(postRequest);
+
+        Optional<IdempotencyKey> existing = idempotencyService.find(key);
+
+        // ✅ CASE 1: Already exists
+        if (existing.isPresent()) {
+
+            IdempotencyKey record =
+                    idempotencyService.validateAndReturn(key, requestHash);
+
+            ApiResponseWrapper<Post> response =
+                    mapper.readValue(record.getResponse(), ApiResponseWrapper.class);
+
+            return ResponseEntity.status(record.getStatusCode()).body(response);
+        }
+
+        // ✅ CASE 2: Process request
+        SubCategory subCategory =
+                subCategoryService.findSubCategoryById(postRequest.getSubCategoryId());
+
+        User user = authService.getCurrentUser();
+
+        Post post = Post.builder()
+                .title(postRequest.getTitle())
+                .content(postRequest.getContent())
+                .status(postRequest.getStatus())
+                .userId(user.getId())
+                .subCategory(subCategory)
+                .build();
+
+        if (image != null && !image.isEmpty()) {
+            post.setImage(image.getBytes());
+            post.setImageType(image.getContentType());
+        }
+
+        Post savedPost = postService.createPost(post);
+
+        ApiResponseWrapper<Post> response = ResponseBuilder.success(
+                savedPost,
+                "Post Created successfully",
+                HttpStatus.OK
+        ).getBody();
+
+        // ✅ Save idempotency
+        idempotencyService.save(
+                key,
+                requestHash,
+                mapper.writeValueAsString(response),
+                HttpStatus.OK.value()
+        );
+
+        return ResponseEntity.ok(response);
+       /* ObjectMapper mapper = new ObjectMapper();
         PostRequest postRequest = mapper.readValue(postJson, PostRequest.class);
         SubCategory subCategory = subCategoryService.findSubCategoryById(postRequest.getSubCategoryId());
         User user = authService.getCurrentUser(); // logged-in user
@@ -132,7 +184,7 @@ public class PostController {
                 savedPost,
                 "Post Created successfully",
                 HttpStatus.OK
-        );
+        );*/
     }
 
     @Operation(
