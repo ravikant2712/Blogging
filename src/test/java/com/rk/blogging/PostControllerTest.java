@@ -7,10 +7,7 @@ import com.rk.blogging.dto.PostRequest;
 import com.rk.blogging.dto.SlugRequest;
 import com.rk.blogging.model.Post;
 import com.rk.blogging.model.User;
-import com.rk.blogging.services.CommentService;
-import com.rk.blogging.services.PostService;
-import com.rk.blogging.services.SubCategoryService;
-import com.rk.blogging.services.UserService;
+import com.rk.blogging.services.*;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -66,6 +63,9 @@ public class PostControllerTest {
 
     @MockBean
     private SubCategoryService subCategoryService;
+
+    @MockBean
+    private IdempotencyService idempotencyService;
 
     // ---------- PUBLIC APIs ----------
 
@@ -152,6 +152,7 @@ public class PostControllerTest {
         mockMvc.perform(multipart("/api/posts")
                         .file(postJson)
                         .contentType(MediaType.MULTIPART_FORM_DATA)
+                        .header("Idempotency-Key", "test-key-123")
                         .with(csrf()))
                 .andExpect(status().isOk())
             //    .andExpect(jsonPath("$.data.title").value("Created"));

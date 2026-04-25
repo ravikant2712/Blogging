@@ -40,6 +40,8 @@ dependencies {
     implementation ("io.micrometer:micrometer-registry-prometheus")
     implementation("org.springframework.boot:spring-boot-starter-actuator")
 
+    implementation ("com.fasterxml.jackson.datatype:jackson-datatype-jsr310")
+
     testImplementation("com.h2database:h2")
     compileOnly("org.projectlombok:lombok")
 	annotationProcessor("org.projectlombok:lombok")

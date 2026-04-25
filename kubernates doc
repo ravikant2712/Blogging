@@ -1,0 +1,7 @@
+// verify kubernates running
+kubectl get
+Expected output:
+
+NAME           STATUS   ROLES
+docker-desktop Ready    control-plane
+
