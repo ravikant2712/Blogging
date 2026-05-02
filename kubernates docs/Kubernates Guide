@@ -1,0 +1,14 @@
+
+Core Concepts
+Monolithic vs Microservices , Kubernetes Architecture, Setup On Local AWS/EC2 ,
+kubectl, pods , namespaces, label, selectors , annotations
+
+Workload
+Deployment, StatefulSet, DemonSet, ReplicaSet, Jobs, CronJobs
+
+Networking
+Cluster Networking, Services ,Ingress, Network Polices
+
+Storage
+Persistence Volume(PV), Persistence Volume Claims (PVC), Storage Classes, ConfigMap, Secrets
+
